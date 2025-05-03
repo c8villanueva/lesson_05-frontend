@@ -15,7 +15,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError
       }, //bcs it returns 200 even if may error, so this checks
-      keepUnusedDataFor: 5, // can remove after development, or the default is usually 60secs
+      //keepUnusedDataFor: 5, // can remove after development, or the default is usually 60secs, the countdown kicks in once there are no subscriptions (seen in redux dev tools)
 
       // important since we're working with mongodb
       transformResponse: responseData => {
@@ -36,12 +36,54 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         } else return [{ type: 'User', id: 'LIST' }]
       }
     }),
+
+    // these are mutations now
+    addNewUser: builder.mutation({
+      query: initialUserData => ({
+        url: '/users',
+        method: 'POST',
+        body: {
+          ...initialUserData,
+        }
+      }),
+      invalidatesTags: [
+        { type: 'User', id: "LIST" }
+      ]
+    }),
+
+    updateUser: builder.mutation({
+      query: initialUserData => ({
+        url: '/users',
+        method: 'PATCH',
+        body: {
+          ...initialUserData,
+        }
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: 'User', id: arg.id }
+      ]
+    }),
+
+    deleteUser: builder.mutation({
+      query: ({ id }) => ({
+        url: `/users`,
+        method: 'DELETE',
+        body: { id }
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: 'User', id: arg.id }
+      ]
+    }),
+
   }),
 })
 
 //automatically generates a hook
 export const {
   useGetUsersQuery,
+  useAddNewUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
 } = usersApiSlice
 
 //creating selectors

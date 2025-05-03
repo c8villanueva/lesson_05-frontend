@@ -10,7 +10,11 @@ const UsersList = () => {
     isSuccess,
     isError,
     error
-  } = useGetUsersQuery()
+  } = useGetUsersQuery(undefined, {
+    pollingInterval: 60000, //in milliseconds, so 60s
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: true
+  })
 
   let content
 
