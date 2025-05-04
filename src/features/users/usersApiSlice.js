@@ -11,10 +11,12 @@ const initialState = usersAdapter.getInitialState()
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getUsers: builder.query({
-      query: () => '/users',
-      validateStatus: (response, result) => {
-        return response.status === 200 && !result.isError
-      }, //bcs it returns 200 even if may error, so this checks
+      query: () => ({
+        url: '/users',
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError
+        },
+      }), //bcs it returns 200 even if may error, so this checks
       //keepUnusedDataFor: 5, // can remove after development, or the default is usually 60secs, the countdown kicks in once there are no subscriptions (seen in redux dev tools)
 
       // important since we're working with mongodb
