@@ -12,38 +12,48 @@ import EditNote from './features/notes/EditNote'
 import NewNote from './features/notes/NewNote'
 import Prefetch from './features/auth/Prefetch'
 import PersistLogin from './features/auth/PersistLogin'
+import RequireAuth from './features/auth/RequireAuth'
+import { ROLES } from './config/roles'
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         {/* everything else goes inside and the Layout will be the parent */}
+
+        {/* public routes */}
         <Route index element={<Public />} /> {/* ^ this will be the default */}
         <Route path="login" element={<Login />} />
 
-        {/* where the protected routes would begin */}
+        {/* protected routes */}
         <Route element={<PersistLogin />}>
-          <Route element={<Prefetch />}>
-            <Route path="dash" element={<DashLayout />}>
-              {/* wraps around the other elements protected by this route */}
+          <Route element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}>
+            <Route element={<Prefetch />}>
+              <Route path="dash" element={<DashLayout />}>
+                {/* wraps around the other elements protected by this route */}
 
-              <Route index element={<Welcome />} />
+                <Route index element={<Welcome />} />
 
-              <Route path="users">
-                <Route index element={<UsersList />} />
-                <Route path=":id" element={<EditUser /> } />
-                <Route path="new" element={<NewUserForm /> } />
-              </Route>
+                <Route element={<RequireAuth allowedRoles={[ROLES.Manager, ROLES.Admin]} />}>
+                  <Route path="users">
+                    <Route index element={<UsersList />} />
+                    <Route path=":id" element={<EditUser /> } />
+                    <Route path="new" element={<NewUserForm /> } />
+                  </Route>
+                </Route>
 
-              <Route path="notes">
-                <Route index element={<NotesList />} />
-                <Route path=":id" element={<EditNote /> } />
-                <Route path="new" element={<NewNote /> } />
-              </Route>
+                <Route path="notes">
+                  <Route index element={<NotesList />} />
+                  <Route path=":id" element={<EditNote /> } />
+                  <Route path="new" element={<NewNote /> } />
+                </Route>
 
-            </Route> {/* End Dash */}
-          </Route> {/* End Prefetch */}
-        </Route> {/* End PersistLogin */}
+              </Route> {/* End Dash */}
+            </Route> {/* End Prefetch */}
+          </Route>
+        </Route> {/* End Protected Routes */}
+
+
       </Route>
     </Routes> 
   );
